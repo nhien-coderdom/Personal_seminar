@@ -1,0 +1,76 @@
+Here's the complete implementation of the functions, including Google Style docstrings for each function:
+
+```python
+import numpy as np
+from typing import Dict
+
+def get_gross_returns(net_returns: Dict[str, float]) -> np.ndarray:
+    """Convert net returns to gross returns.
+
+    Args:
+        net_returns (Dict[str, float]): A dictionary containing net returns with string keys.
+
+    Returns:
+        np.ndarray: An array of gross returns calculated from the net returns.
+    """
+    gross_returns: np.ndarray = np.array([1 + return_value for return_value in net_returns.values()])
+    return gross_returns
+
+def get_geometric_mean(gross_returns: np.ndarray) -> float:
+    """Calculate the geometric mean of returns.
+
+    Args:
+        gross_returns (np.ndarray): An array of gross returns.
+
+    Returns:
+        float: The geometric mean of the gross returns.
+    """
+    product: float = np.prod(gross_returns)
+    n: int = len(gross_returns)
+    geometric_mean: float = product ** (1 / n)
+    return geometric_mean
+
+def get_net_average(gross_average: float) -> float:
+    """Convert gross average to net average.
+
+    Args:
+        gross_average (float): The average of gross returns.
+
+    Returns:
+        float: The equivalent net average.
+    """
+    net_average: float = gross_average - 1
+    return net_average
+
+def get_average_return(net_returns: Dict[str, float]) -> float:
+    """Calculate the average net return.
+
+    This function computes the average net return from a dictionary of net returns by converting
+    net returns to gross returns, calculating the geometric mean of the gross returns, and then
+    converting it back to a net average.
+
+    Args:
+        net_returns (Dict[str, float]): A dictionary containing net returns with string keys.
+
+    Returns:
+        float: The average net return calculated.
+    """
+    gross_returns: np.ndarray = get_gross_returns(net_returns)
+    gross_average: float = get_geometric_mean(gross_returns)
+    net_average: float = get_net_average(gross_average)
+    return net_average
+```
+
+### Explanation of Google Style Docstrings:
+
+1. **Summary Line**: Each docstring starts with a brief summary line that describes what the function does.
+
+2. **Args Section**: Each function documents its input parameters:
+   - The type of each parameter is specified (e.g., `Dict[str, float]` for `net_returns`).
+   - A concise description of each parameter follows.
+
+3. **Returns Section**: Each function documents its return value:
+   - The return type is specified (e.g., `np.ndarray` for `get_gross_returns`).
+   - A concise description of what the function returns follows.
+
+This documentation format is standard and helps other developers understand the purpose and usage of each function easily.

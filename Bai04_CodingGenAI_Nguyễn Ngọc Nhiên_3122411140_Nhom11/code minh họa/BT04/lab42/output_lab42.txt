@@ -1,0 +1,249 @@
+================================
+Change request: Optimize this function
+AI suggestion:
+As a senior developer, I look for three things: **readability**, **performance**, and **accuracy**.
+
+While your current function works, it can be improved by reducing look-up overhead, simplifying logic with the standard library, and improving the precision of the calculation.
+
+Here are three ways to optimize this function, depending on your scale.
+
+### 1. The Pythonic "Standard" Optimization
+Using `collections.defaultdict` is the industry standard for aggregation. It eliminates the `if/else` branch inside your loop, which makes the code cleaner and slightly faster because the check is handled at the C-level.
+
+I also recommend **constant folding**: instead of dividing by 4 and then multiplying by 0.0001, multiply by a single pre-calculated factor.
+
+```python
+from collections import defaultdict
+from typing import Dict, List
+
+def get_estimated_user_costs(prompts_data: List[dict]) -> Dict[str, float]:
+    # Constant: 0.0001 / 4
+    COST_PER_CHAR = 0.000025
+    costs = defaultdict(float)
+
+    for entry in prompts_data:
+        # Accessing dict keys once is faster than multiple times
+        user = entry["user"]
+        prompt_len = len(entry["prompt"])
+
+        costs[user] += prompt_len * COST_PER_CHAR
+
+    return dict(costs)
+```
+
+### 2. High-Performance Optimization (Pandas)
+If `prompts_data` contains tens of thousands of rows, Python’s native loops become a bottleneck. Using `pandas` will perform this operation in vectorized C, which is significantly faster for large datasets.
+
+```python
+import pandas as pd
+
+def get_estimated_user_costs_fast(prompts_data: List[dict]) -> Dict[str, float]:
+    df = pd.DataFrame(prompts_data)
+
+    # Vectorized calculation
+    df['cost'] = df['prompt'].str.len() * 0.000025
+
+    return df.groupby('user')['cost'].sum().to_dict()
+```
+
+### 3. Improving "Senior Level" Accuracy
+The "length / 4" rule is a rough approximation for English. If this code handles billing, accuracy matters. A senior developer would likely suggest using a real tokenizer (like `tiktoken`) because prompt costs are based on tokens, not characters.
+
+```python
+import tiktoken # Standard for OpenAI models
+
+def get_estimated_user_costs_accurate(prompts_data: List[dict], model="gpt-3.5-turbo") -> Dict[str, float]:
+    encoding = tiktoken.encoding_for_model(model)
+    COST_PER_TOKEN = 0.0001 # Update based on specific model pricing
+    costs = defaultdict(float)
+
+    for entry in prompts_data:
+        # tiktoken is highly optimized and written in Rust
+        token_count = len(encoding.encode(entry["prompt"]))
+        costs[entry["user"]] += token_count * COST_PER_TOKEN
+
+    return dict(costs)
+```
+
+### Summary of Improvements:
+1.  **Branching:** Replaced the `if/else` logic with `defaultdict(float)` to reduce CPU branch mispredictions.
+2.  **Arithmetic:** Combined constants (`0.0001 / 4`) to reduce the number of floating-point operations per iteration from two to one.
+3.  **Type Hinting:** Added `typing` hints to improve IDE support and maintainability.
+4.  **Scaling:** Identified that for large-scale data, a vectorized approach (Pandas) or a real tokenizer (`tiktoken`) is more professional.
+
+**My Recommendation:** Use **Option 1** for simple scripts, and **Option 3** if this is for a production AI application where cost precision is important.
+================================
+Change request: Improve readability
+AI suggestion:
+As a senior developer, I look for code that is not only functional but also **self-documenting, maintainable, and idiomatic.**        
+
+Here are three ways to improve the readability and structure of your function, ranging from "cleaner" to "enterprise-ready."
+
+### 1. The Idiomatic Approach (Recommended)
+This version uses `collections.defaultdict` to eliminate the manual dictionary check and moves "magic numbers" into named constants to explain their purpose.
+
+```python
+from collections import defaultdict
+
+# Use constants to explain "magic numbers"
+CHARS_PER_TOKEN = 4
+COST_PER_TOKEN = 0.0001
+
+def get_estimated_user_costs(prompts_data):
+    user_costs = defaultdict(float)
+
+    for entry in prompts_data:
+        user = entry["user"]
+        prompt = entry["prompt"]
+
+        tokens = len(prompt) / CHARS_PER_TOKEN
+        cost = tokens * COST_PER_TOKEN
+
+        user_costs[user] += cost
+
+    return dict(user_costs)
+```
+
+### 2. The Professional Approach (Type Hints & Docs)
+In a professional environment, readability is heavily improved by **Type Hinting** and **Docstrings**. This tells other developers exactly what data structures to expect.
+
+```python
+from typing import List, Dict
+
+CHARS_PER_TOKEN = 4
+PRICE_PER_TOKEN = 0.0001
+
+def get_estimated_user_costs(prompts_data: List[Dict[str, str]]) -> Dict[str, float]:
+    """
+    Calculates the total estimated API cost per user based on prompt length.
+    """
+    costs = {}
+
+    for entry in prompts_data:
+        user = entry["user"]
+        prompt_len = len(entry["prompt"])
+
+        estimated_cost = (prompt_len / CHARS_PER_TOKEN) * PRICE_PER_TOKEN
+
+        # Using .get() is a clean alternative to if/else or defaultdict
+        costs[user] = costs.get(user, 0.0) + estimated_cost
+
+    return costs
+```
+
+### Key Improvements Explained
+
+1.  **Eliminated "Magic Numbers":** Seeing `4` and `0.0001` in code is confusing. Defining `CHARS_PER_TOKEN` and `COST_PER_TOKEN` makes the business logic immediately obvious.
+2.  **`collections.defaultdict` or `.get()`:**
+    *   Your original code used a 4-line `if/else` block just to handle a missing key.
+    *   Using `costs.get(user, 0)` or `defaultdict(float)` reduces cognitive load by handling the "missing key" logic automatically.  
+3.  **Variable Naming:**
+    *   Changed `estimated_tokens` to `tokens` (conciseness).
+    *   Changed `entry["prompt"]` to `prompt_len` if you only need the length, which clarifies that the content of the prompt isn't being used, only its size.
+4.  **Type Hinting:** Adding `: List[Dict[str, str]]` allows IDEs (like VS Code or PyCharm) to provide autocomplete and catch errors before you even run the code.
+
+### Bonus: The "Clean Logic" Extraction
+If your cost calculation logic ever gets more complex (e.g., different models have different prices), extract the calculation into its own small helper function:
+
+```python
+def calculate_prompt_cost(prompt: str) -> float:
+    tokens = len(prompt) / 4
+    return tokens * 0.0001
+
+# Then inside your loop:
+# costs[user] = costs.get(user, 0) + calculate_prompt_cost(entry["prompt"])
+```
+This keeps the "aggregation" logic (the loop) separate from the "math" logic.
+================================
+Change request: Add error handling
+AI suggestion:
+As a senior developer, I look for code that is **robust** (doesn't crash on bad data), **maintainable** (uses constants instead of magic numbers), and **expressive** (uses the right data structures).
+
+Here is the refactored function followed by an explanation of the improvements.
+
+### Improved Code
+
+```python
+import logging
+from collections import defaultdict
+from typing import Dict, List, Any
+
+# Configure logging (usually handled at the app level)
+logger = logging.getLogger(__name__)
+
+# Constants to avoid "Magic Numbers"
+CHARS_PER_TOKEN = 4
+COST_PER_TOKEN = 0.0001
+
+def get_estimated_user_costs(prompts_data: List[Dict[str, Any]]) -> Dict[str, float]:
+    """
+    Calculates estimated costs per user based on prompt length.
+
+    Args:
+        prompts_data: A list of dicts containing 'user' and 'prompt' keys.
+
+    Returns:
+        A dictionary mapping usernames to their total accumulated cost.
+    """
+    # Defensive check: Ensure input is iterable
+    if not isinstance(prompts_data, list):
+        logger.error(f"Expected list for prompts_data, got {type(prompts_data)}")
+        return {}
+
+    # Use defaultdict to eliminate the 'if user not in costs' boilerplate
+    costs = defaultdict(float)
+
+    for index, entry in enumerate(prompts_data):
+        try:
+            # 1. Check for missing keys or non-dictionary entries
+            user = entry["user"]
+            prompt = entry["prompt"]
+
+            # 2. Type safety: Ensure prompt is a string to avoid len() errors
+            if not isinstance(prompt, str):
+                logger.warning(f"Entry at index {index} has a non-string prompt. Skipping.")
+                continue
+
+            # 3. Calculation logic
+            estimated_tokens = len(prompt) / CHARS_PER_TOKEN
+            cost = estimated_tokens * COST_PER_TOKEN
+
+            costs[user] += cost
+
+        except KeyError as e:
+            logger.error(f"Missing required key {e} in entry at index {index}.")
+        except TypeError:
+            logger.error(f"Entry at index {index} is not a dictionary.")
+        except Exception as e:
+            # Catch-all for unexpected issues to prevent the entire batch from failing
+            logger.error(f"Unexpected error processing entry {index}: {e}")
+
+    return dict(costs)
+```
+
+### Key Improvements Explained
+
+#### 1. Input Validation & Defensive Programming
+In the original code, if `prompts_data` was `None`, the script would crash with a `TypeError`. The refactored version checks if the input is a list and uses a `try-except` block inside the loop. This ensures that **one malformed record doesn't crash the entire calculation** for all other users.
+
+#### 2. Using `collections.defaultdict`
+The original code used:
+```python
+if user not in costs:
+    costs[user] = cost
+else:
+    costs[user] += cost
+```
+Using `defaultdict(float)` makes this one line: `costs[user] += cost`. This is more Pythonic and reduces the surface area for logic errors.
+
+#### 3. Eliminating "Magic Numbers"
+The numbers `4` and `0.0001` are "magic numbers." If the cost of the API changes or your tokenization logic evolves, you’d have to hunt through the code to find them. Moving these to **Constants** at the top of the file makes the code easier to maintain and read.     
+
+#### 4. Type Hinting
+Adding `(prompts_data: List[Dict[str, Any]]) -> Dict[str, float]` provides immediate context to other developers (and your IDE) about what data structures are expected, reducing integration bugs.
+
+#### 5. Graceful Logging
+Instead of using `print()`, I’ve implemented `logging`. In a production environment, this allows you to track errors in a log file or a monitoring tool (like Sentry or Datadog) without interrupting the user experience.
+
+#### 6. Handling Specific Exceptions
+I targeted `KeyError` (missing keys) and `TypeError` (bad data types) specifically. This allows the function to skip bad data while still processing the valid entries, which is crucial for data processing pipelines.

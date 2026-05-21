@@ -1,0 +1,23 @@
+Initial prompt:
+How can I commit my files to GitHub from PyCharm terminal?
+
+Improved prompt:
+I am using PyCharm on Windows and I want to upload my project to GitHub using the terminal inside PyCharm.
+
+Please provide step-by-step instructions on how to:
+1. Initialize a Git repository
+2. Add files to Git
+3. Commit the changes
+4. Push the project to a new GitHub repository
+
+Include the exact Git commands I should run in the terminal.
+
+** Cấu trúc của một promt tốt thường có các nội dung như : 
+Context
+Task
+Constraints
+Expected output
+** Như ví dụ thì:
+Context: I'm using PyCharm on Windows
+Task: Upload project to GitHub
+Output: Step-by-step Git commands 

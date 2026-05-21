@@ -1,0 +1,74 @@
+```python
+from typing import Dict
+import numpy as np
+
+def get_gross_returns(net_returns: Dict[str, float]) -> np.ndarray:
+    """
+    Calculate gross returns from net returns.
+
+    Gross return is calculated as `1 + net return`. For example,
+    if the net return is 0.1 (10%), the gross return would be 1.1.
+
+    Args:
+        net_returns (Dict[str, float]): A dictionary where keys are
+        identifiers (e.g., asset names) and values represent
+        the net returns corresponding to those identifiers.
+
+    Returns:
+        np.ndarray: An array of gross returns corresponding to the input net returns.
+    """
+    gross_returns: np.ndarray = np.array([1 + return_value for return_value in net_returns.values()])
+    return gross_returns
+
+def get_geometric_mean(gross_returns: np.ndarray) -> float:
+    """
+    Calculate the geometric mean of the gross returns.
+
+    The geometric mean is calculated using the formula:
+    (Product of returns)^(1/n) - 1, where n is the number of returns.
+
+    Args:
+        gross_returns (np.ndarray): An array of gross returns.
+
+    Returns:
+        float: The geometric mean of the gross returns, representing the
+        net return.
+    """
+    product: float = np.prod(gross_returns)
+    n: int = len(gross_returns)
+    return (product ** (1/n)) - 1
+
+def get_net_average(gross_average: float) -> float:
+    """
+    Calculate net average from gross average.
+
+    The net return is derived from the gross return by using the
+    formula: Net return = Gross return - 1.
+
+    Args:
+        gross_average (float): The average of gross returns.
+
+    Returns:
+        float: The net average calculated from the gross average.
+    """
+    return gross_average  # The gross average is already in the format needed.
+
+def get_average_return(net_returns: Dict[str, float]) -> float:
+    """
+    Calculate average net return from a dictionary of net returns.
+
+    This function computes the gross returns, calculates their
+    geometric mean, and then derives the net average return.
+
+    Args:
+        net_returns (Dict[str, float]): A dictionary where keys are
+        identifiers and values represent the net returns.
+
+    Returns:
+        float: The average net return calculated from the provided net returns.
+    """
+    gross_returns: np.ndarray = get_gross_returns(net_returns)
+    gross_average: float = get_geometric_mean(gross_returns)
+    net_average: float = get_net_average(gross_average)
+    return net_average
+```

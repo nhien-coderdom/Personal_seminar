@@ -1,0 +1,38 @@
+// This is your Prisma schema file for Insight Service
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/insight-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("INSIGHT_DATABASE_URL")
+}
+
+model SpendingSnapshot {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  period    String   @db.VarChar(7) // '2026-04'
+  category  String?  @db.VarChar(100)
+  total     BigInt
+  count     Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([period])
+  @@map("spending_snapshots")
+}
+
+model AiInsight {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  type      String   @db.VarChar(50) // 'behavior' | 'recommendation'
+  content   String   @db.Text
+  period    String?  @db.VarChar(7)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([period])
+  @@map("ai_insights")
+}

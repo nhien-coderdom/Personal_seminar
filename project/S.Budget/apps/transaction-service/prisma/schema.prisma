@@ -1,0 +1,46 @@
+// This is your Prisma schema file for Transaction Service
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/transaction-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("TRANSACTION_DATABASE_URL")
+}
+
+model Category {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @db.VarChar(100)
+  icon      String?  @db.VarChar(50)
+  color     String?  @db.VarChar(7)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  transactions Transaction[]
+
+  @@map("categories")
+}
+
+model Transaction {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  amount     BigInt
+  type       String   @default("expense") @db.VarChar(10) // expense | income
+  categoryId String?  @map("category_id") @db.Uuid
+  note       String?  @db.Text
+  imageUrl   String?  @map("image_url") @db.VarChar(500)
+  source     String   @default("manual") @db.VarChar(20) // manual | ocr | quick_add | share
+  isDeleted  Boolean  @default(false) @map("is_deleted")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  date       DateTime @default(now()) @map("transaction_date")
+
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([date])
+  @@index([categoryId])
+  @@map("transactions")
+}

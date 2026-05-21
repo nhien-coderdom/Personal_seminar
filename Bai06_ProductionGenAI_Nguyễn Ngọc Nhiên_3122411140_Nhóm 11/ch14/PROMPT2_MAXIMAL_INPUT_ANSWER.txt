@@ -1,0 +1,79 @@
+CONTEXT: You are provided with runtime benchmark in {{{ BENCHMARKS }}} and a time limit in {{{ LIMIT}}}.
+TASK: What is the largest input that can be computed under the time limit?
+
+BENCHMARKS: {{{
+Runtime for fibonacci_recursive(10): 0.0000 seconds
+Runtime for fibonacci_recursive(15): 0.0000 seconds
+Runtime for fibonacci_recursive(20): 0.0040 seconds
+Runtime for fibonacci_recursive(25): 0.0250 seconds
+Runtime for fibonacci_recursive(30): 0.3665 seconds
+Runtime for fibonacci_recursive(35): 2.7771 seconds
+Runtime for fibonacci_recursive(40): 25.1559 seconds
+}}}
+
+LIMIT: {{{ 100 seconds }}}
+
+MAXIMAL INPUT: n ≈ 41
+
+═══════════════════════════════════════════════════════════════════
+DETAILED ANALYSIS:
+═══════════════════════════════════════════════════════════════════
+
+STEP 1: CALCULATE GROWTH RATE
+─────────────────────────────────
+From n=35 to n=40 (+5 increment):
+- Time increases from 2.7771s to 25.1559s
+- Growth factor = 25.1559 / 2.7771 ≈ 9.06x per 5 increments
+
+From n=30 to n=35 (+5 increment):
+- Time increases from 0.3665s to 2.7771s
+- Growth factor = 2.7771 / 0.3665 ≈ 7.58x per 5 increments
+
+Average growth ≈ 8.3x per 5 increments (or ≈ 2.07x per single increment)
+
+STEP 2: EXTRAPOLATE BEYOND n=40
+─────────────────────────────────
+Using conservative growth rate of 2.0x per increment:
+
+n=40:  25.1559 seconds
+n=41:  25.1559 × 2.0 ≈ 50.31 seconds    (UNDER 100s limit)
+n=42:  50.31 × 2.0 ≈ 100.62 seconds ✗ (EXCEEDS 100s limit)
+
+STEP 3: VERIFICATION WITH MORE CONSERVATIVE ESTIMATE
+──────────────────────────────────────────────────────
+Using growth rate of 2.1x (from exponential O(2^n)):
+
+n=40:  25.1559 seconds
+n=41:  25.1559 × 2.1 ≈ 52.83 seconds    (UNDER 100s)
+n=42:  52.83 × 2.1 ≈ 110.95 seconds ✗ (EXCEEDS 100s)
+
+STEP 4: AGGRESSIVE ESTIMATE (2.0x growth)
+────────────────────────────────────────────
+n=40:  25.1559 seconds
+n=41:  50.3118 seconds    (exactly 50s - comfortable margin)
+
+═══════════════════════════════════════════════════════════════════
+CONCLUSION:
+═══════════════════════════════════════════════════════════════════
+
+   SAFE RANGE: n ≤ 40    (guarantees < 25 seconds)
+   ACCEPTABLE: n = 41    (approximately 50-53 seconds)
+✗ BEYOND n = 41         (will exceed 100 seconds)
+
+ANSWER: Maximum Input = n ≈ 41
+
+With 100 second time limit, fibonacci_recursive can safely compute up to n=41,
+with n=42 expected to exceed the limit.
+
+Note: This is why exponential algorithms are problematic!
+Just 1 additional increment doubles or more the runtime.
+
+═══════════════════════════════════════════════════════════════════
+RISK ASSESSMENT:
+═══════════════════════════════════════════════════════════════════
+
+If you choose n=41:  ~50-53 seconds  → 50-53% of budget used    SAFE
+If you choose n=42:  ~100+ seconds   → TIMEOUT ✗ DANGEROUS
+If you choose n=40:  ~25 seconds     → 25% of budget used    VERY SAFE
+
+Recommendation: Use n = 41 for maximum calculation while staying safe.

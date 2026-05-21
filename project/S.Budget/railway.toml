@@ -1,0 +1,28 @@
+# =========================================================
+# S.Budget — Railway Deployment Config
+# =========================================================
+# Each microservice is deployed as a SEPARATE Railway service.
+#
+# Deploy commands (run from repo root):
+#   railway redeploy --service <SERVICE_ID> --yes
+#
+# Required GitHub Secrets:
+#   RAILWAY_TOKEN                       — Project-level API token
+#   RAILWAY_SERVICE_ID_API_GATEWAY      — Railway service ID for api-gateway
+#   RAILWAY_SERVICE_ID_AUTH             — Railway service ID for auth-service
+#   RAILWAY_SERVICE_ID_TRANSACTION      — Railway service ID for transaction-service
+#   RAILWAY_SERVICE_ID_AI               — Railway service ID for ai-service
+#   RAILWAY_SERVICE_ID_INSIGHT          — Railway service ID for insight-service
+#
+# Each Railway service should be configured to pull from Docker Hub:
+#   Image: docker.io/<DOCKER_HUB_USERNAME>/sbudget-<service-name>:latest
+# =========================================================
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# Health check — Railway will use the app's default HTTP port
+[deploy.healthcheck]
+path = "/health"
+timeout = 30

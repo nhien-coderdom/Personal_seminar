@@ -1,0 +1,106 @@
+CONTEXT: You are provided with a Python function enclosed with {{{ FUNCTION }}} and examples enclosed with {{{ EXAMPLE}}} / {{{ SPACE_COMPLEXITY}}}.
+TASK: return the space complexity of the function.
+
+EXAMPLE 1: {{{
+def get_squared(n: int) -> int:
+    squares = []
+    for i in range(n):
+        squares.append(i ** 2)
+    return squares
+}}}
+SPACE COMPLEXITY 1: {{{ O(n) }}}
+
+EXAMPLE 2: {{{
+def get_numbers_up_to_limit(n: int) -> int:
+    result = ""
+    for i in int:
+        result += f"{i}, "
+    return result
+}}}
+SPACE COMPLEXITY 2: {{{ O(1) }}}
+
+FUNCTION: {{{
+def fibonacci_recursive(n):
+    if n <= 0:
+        return 0
+    if n == 1:
+        return 1
+    return fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2)
+}}}
+
+SPACE_COMPLEXITY: O(n) - LINEAR SPACE COMPLEXITY
+
+═══════════════════════════════════════════════════════════════════
+EXPLANATION:
+═══════════════════════════════════════════════════════════════════
+
+The function has linear space complexity O(n) because:
+
+1. CALL STACK DEPTH:
+   Each recursive call adds a frame to the call stack
+   Maximum depth = n (when computing from n down to base case 0 or 1)
+
+2. CALL STACK VISUALIZATION FOR fib(5):
+   
+   fib(5)
+   ├─ fib(4)
+   │  ├─ fib(3)
+   │  │  ├─ fib(2)          ← deepest path: 5 stack frames
+   │  │  │  ├─ fib(1) [BASE]
+   │  │  │  └─ fib(0) [BASE]
+   
+   The deepest chain from fib(5) to base case is 5 frames:
+   Stack: [fib(5), fib(4), fib(3), fib(2), fib(1)] or [fib(5), fib(4), fib(3), fib(2), fib(0)]
+
+3. MATHEMATICALLY:
+   The recursive calls go: n → (n-1) → (n-2) → ... → 0 or 1
+   Maximum stack depth at any moment = n
+   Therefore: Space ∝ n → O(n)
+
+4. MEMORY MEASUREMENTS:
+   
+   Python function call overhead ≈ 48 bytes per frame (varies by Python version)
+   
+   n=10:   10 frames × 48 bytes ≈ 480 bytes
+   n=100:  100 frames × 48 bytes ≈ 4.8 KB
+   n=1000: 1000 frames × 48 bytes ≈ 48 KB
+   n=3000: 3000 frames × 48 bytes ≈ 144 KB ← Causes stack overflow!
+
+5. STACK OVERFLOW LIMIT:
+   Most systems have ~1-8 MB stack limit
+   1 MB limit ÷ 48 bytes/frame ≈ 20,800 maximum depth
+   Python typically hits RecursionError around n=3,000-5,000
+
+═══════════════════════════════════════════════════════════════════
+COMPARISON WITH OTHER APPROACHES:
+═══════════════════════════════════════════════════════════════════
+
+Method          Space    Max n before crash    Use Case
+─────────────────────────────────────────────────────────
+Recursive       O(n)     ~3,000-5,000         ✗ Not recommended
+Iterative       O(1)     ~10^308 or higher       Recommended
+Matrix(pair)    O(log n) ~10^308 or higher       Recommended
+
+═══════════════════════════════════════════════════════════════════
+IMPORTANT NOTE:
+═══════════════════════════════════════════════════════════════════
+
+Even though TIME complexity O(2^n) is the primary reason to avoid
+fibonacci_recursive(), SPACE complexity O(n) is also a concern for
+very large n, causing stack overflow crashes.
+
+Example: For n=5000
+- TIME COMPLEXITY: O(2^5000) ≈ 10^1505 operations → Impossible!
+- SPACE COMPLEXITY: O(5000) ≈ 240 KB → Stack overflow!
+
+Both time and space make recursive fibonacci unsuitable for n > ~30
+
+═══════════════════════════════════════════════════════════════════
+KEY TAKEAWAY:
+═══════════════════════════════════════════════════════════════════
+
+   fibonacci_recursive() has O(n) space (call stack depth)
+   This is linear and grows with n
+   Combined with O(2^n) time, it's doubly inefficient
+   Use fibonacci_iterative() instead for O(1) space + O(n) time
+   Use fib_pair() for O(log n) space + O(log n) time (best!)

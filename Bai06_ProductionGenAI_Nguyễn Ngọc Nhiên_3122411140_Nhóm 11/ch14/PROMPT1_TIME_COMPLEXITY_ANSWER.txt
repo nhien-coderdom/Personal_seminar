@@ -1,0 +1,81 @@
+CONTEXT: You are provided with a Python function enclosed with {{{ FUNCTION }}} and examples enclosed with {{{ EXAMPLE}}} / {{{ TIME_COMPLEXITY}}}.
+TASK: return the time complexity of the function.
+
+EXAMPLE 1: {{{
+def get_squared(n: int) -> int:
+    return n ** 2
+}}}
+TIME COMPLEXITY 1: {{{ O(1) }}}
+
+EXAMPLE 2: {{{
+def get_numbers_up_to_limit(n: int) -> int:
+    result = ""
+    for i in int:
+        result += f"{i}, "
+    return result
+}}}
+TIME COMPLEXITY 2: {{{ O(n) }}}
+
+FUNCTION: {{{
+def fibonacci_recursive(n):
+    if n <= 0:
+        return 0
+    if n == 1:
+        return 1
+    return fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2)
+}}}
+
+TIME_COMPLEXITY: O(2^n) - EXPONENTIAL TIME COMPLEXITY
+
+═══════════════════════════════════════════════════════════════════
+EXPLANATION:
+═══════════════════════════════════════════════════════════════════
+
+The function has exponential time complexity O(2^n) because:
+
+1. TREE OF RECURSIVE CALLS:
+   For each call fib(n), it spawns TWO more calls: fib(n-1) and fib(n-2)
+   
+   Example tree for fib(5):
+                            fib(5)
+                    /                  \
+                fib(4)                  fib(3)
+              /        \               /      \
+          fib(3)      fib(2)       fib(2)    fib(1)
+         /    \       /    \       /   \
+      fib(2) fib(1) fib(1) fib(0) fib(1) fib(0)
+      /  \
+   fib(1) fib(0)
+
+2. TOTAL NUMBER OF NODES IN TREE ≈ 2^n
+
+3. REDUNDANT CALCULATIONS:
+   Many values are recalculated multiple times:
+   - fib(3) is calculated 2 times
+   - fib(2) is calculated 3 times
+   - fib(1) is calculated 5 times
+   - etc.
+
+4. MEASURED EVIDENCE:
+   Runtime for fibonacci_recursive(n):
+   - n=10:  0.0 seconds     (1,024 calls ≈ 2^10)
+   - n=15:  0.0 seconds     (32,768 calls ≈ 2^15)
+   - n=20:  0.004 seconds   (1,048,576 calls ≈ 2^20)
+   - n=25:  0.025 seconds   (33.5 million calls)
+   - n=30:  0.367 seconds   (1.07 billion calls)
+   - n=35:  2.777 seconds   (34.2 billion calls)
+   - n=40:  25.156 seconds  (1.09 trillion calls)
+
+5. GROWTH RATE IS EXPONENTIAL:
+   From n=30 to n=35 (+5): Time increases ~7.6x
+   From n=35 to n=40 (+5): Time increases ~9.0x
+   (Exponential growth ≈ 2^5 ≈ 32x per 5 increments, but affected by system overhead)
+
+═══════════════════════════════════════════════════════════════════
+RECOMMENDATION:
+═══════════════════════════════════════════════════════════════════
+∴ NEVER use fibonacci_recursive() for n > 30
+
+For large n, use:
+- fibonacci_iterative() → O(n) time
+- fib_pair() [matrix method] → O(log n) time

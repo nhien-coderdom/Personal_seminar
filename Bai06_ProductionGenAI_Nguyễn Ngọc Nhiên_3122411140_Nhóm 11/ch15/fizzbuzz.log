@@ -1,0 +1,6 @@
+2026-03-30 20:46:25 INFO Function print_fizzbuzz called with args: (15,), kwargs: {}
+2026-03-30 20:46:25 INFO Function print_fizzbuzz called 1 times
+2026-03-30 20:46:25 INFO Function print_fizzbuzz called with args: ('15',), kwargs: {}
+2026-03-30 20:46:25 INFO Function print_fizzbuzz called 2 times
+2026-03-30 20:46:25 INFO Function print_fizzbuzz called with args: (600,), kwargs: {}
+2026-03-30 20:46:25 INFO Function print_fizzbuzz called 3 times

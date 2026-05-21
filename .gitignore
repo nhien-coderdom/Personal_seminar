@@ -1,0 +1,25 @@
+# Maven
+target/
+*.jar
+!pom.xml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.zip
+*.rar
+*.tar.gz

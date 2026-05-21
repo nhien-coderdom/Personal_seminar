@@ -1,0 +1,96 @@
+CONTEXT: You are provided with runtime benchmark and a SPACE limit in {{{ LIMIT}}}.
+TASK: What is the largest input that can be computed under the space limit?
+
+SPACE LIMIT: {{{ 100 MB }}}
+
+ANALYSIS:
+{{{
+Python function frame overhead: ~48 bytes per call
+Recursive call stack depth for fib(n): n frames maximum
+
+Space needed:
+- fib(10):   10 × 48 bytes ≈ 480 bytes
+- fib(100):  100 × 48 bytes ≈ 4.8 KB
+- fib(1000): 1000 × 48 bytes ≈ 48 KB
+- fib(10,000): 10,000 × 48 bytes ≈ 480 KB
+- fib(100,000): 100,000 × 48 bytes ≈ 4.8 MB
+- fib(1,000,000): 1,000,000 × 48 bytes ≈ 48 MB
+- fib(2,000,000): 2,000,000 × 48 bytes ≈ 96 MB    (under 100MB)
+- fib(2,100,000): 2,100,000 × 48 bytes ≈ 100.8 MB ✗ (exceeds 100MB)
+}}}
+
+MAXIMAL INPUT (Space Limited): n ≈ 2,000,000
+
+═══════════════════════════════════════════════════════════════════
+DETAILED CALCULATION:
+═══════════════════════════════════════════════════════════════════
+
+100 MB = 100 × 1024 × 1024 = 104,857,600 bytes
+
+Max n = 104,857,600 bytes ÷ 48 bytes/frame ≈ 2,184,533
+
+Conservative estimate: n ≈ 2,150,000
+
+HOWEVER, THIS IS MISLEADING! SEE IMPORTANT NOTE BELOW.
+
+═══════════════════════════════════════════════════════════════════
+ IMPORTANT NOTE:
+═══════════════════════════════════════════════════════════════════
+
+SPACE LIMIT is NOT the bottleneck for fibonacci_recursive()!
+
+TIME COMPLEXITY is the real constraint:
+- Prompt 2 showed: n=41 approaches 100 second time limit
+- For n=2,000,000: Time = O(2^2,000,000) ≈ impossible to compute!
+
+Timeline Comparison:
+- n=35: 2.8 seconds
+- n=41: ~50 seconds (time limited)
+- n=50: Days
+- n=100: Centuries
+- n=2,000,000: Longer than age of universe!
+
+PRACTICAL ANSWER:
+┌─────────────────────────────────────────────────────────────┐
+│ Even with unlimited space (100 MB or 1 TB or 1 EB):        │
+│ fibonacci_recursive() is limited by TIME, not SPACE!        │
+│                                                             │
+│ Maximum practical n ≈ ~41 (time-limited)                   │
+│ NOT n ≈ 2,000,000 (space-theoretical)                      │
+└─────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+MATHEMATICAL REALITY:
+═══════════════════════════════════════════════════════════════════
+
+Operations needed for fib_recursive(n):
+- n=41:  ~4×10^12 operations (doable in seconds)
+- n=50:  ~4×10^15 operations (takes years)
+- n=100: ~4×10^29 operations (impossible)
+- n=2,000,000: ~10^600,000 operations (more atoms in universe!)
+
+Computer speed: ~10^9 operations/second
+Time for n=50: 4×10^15 ÷ 10^9 = 4,000,000 seconds = ~46 days
+
+═══════════════════════════════════════════════════════════════════
+THEORETICAL vs PRACTICAL:
+═══════════════════════════════════════════════════════════════════
+
+Theoretical (space only):  n ≈ 2,000,000
+Practical (time + space):  n ≈ 41
+Ratio:                     50,000x difference!
+
+This shows that for recursive fibonacci:
+   Time complexity O(2^n) is EXPONENTIALLY worse than space O(n)
+
+═══════════════════════════════════════════════════════════════════
+CONCLUSION:
+═══════════════════════════════════════════════════════════════════
+
+   Theoretical max (space): n ≈ 2,000,000+
+✗ Practical max (time): n ≈ 41
+✗ Recommended: Use iterative or matrix method instead!
+
+This lesson demonstrates why understanding BOTH time and space
+complexity is crucial - but TIME is the more severe constraint
+for exponential algorithms.

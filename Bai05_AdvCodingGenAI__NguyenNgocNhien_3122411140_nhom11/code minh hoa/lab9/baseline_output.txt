@@ -1,0 +1,33 @@
+def get_geometric_mean(net_returns: dict[str, float]) -> float:
+    """
+    Calculate the geometric mean of net returns.
+
+    Assumptions:
+      - Each value in the net_returns dictionary is a net return expressed in decimal form.
+        For example, a 10% return is represented as 0.10.
+      - The geometric mean is computed by first converting each net return into a growth factor (1 + return),
+        then taking the Nth root of the product of these factors, and finally subtracting 1.
+      - If net_returns is empty, the function returns 0.0.
+
+    For example, if net_returns = {'A': 0.1, 'B': 0.2, 'C': -0.05},
+    the geometric mean is computed as:
+         gm = ( (1+0.1) * (1+0.2) * (1-0.05) )**(1/3) - 1
+
+    Returns:
+        The geometric mean of the net returns.
+    """
+    import math
+
+    if not net_returns:
+        return 0.0
+
+    # Compute the product of (1 + return) for all net returns.
+    total_product = 1.0
+    for value in net_returns.values():
+        total_product *= (1 + value)
+
+    count = len(net_returns)
+    # The geometric mean factor is the count-root of the product, subtract 1 to get the average net return.
+    geometric_mean = total_product ** (1 / count) - 1
+
+    return geometric_mean
