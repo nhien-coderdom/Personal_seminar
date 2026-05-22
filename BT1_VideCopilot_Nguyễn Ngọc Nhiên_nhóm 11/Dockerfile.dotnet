@@ -1,0 +1,18 @@
+# Stage 1: Build and publish the .NET app
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+COPY dotnet/ .
+RUN dotnet restore ContosoWebApp.sln
+RUN dotnet publish ContosoWebApp.sln -c Release -o /app/publish
+
+# Stage 2: Runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+# Set environment variable for Java API base URL
+ENV ApiSettings__BaseUrl=http://localhost:8080/api
+
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "Contoso.BlazorApp.dll"]
