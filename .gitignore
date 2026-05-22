@@ -23,3 +23,10 @@ Thumbs.db
 *.zip
 *.rar
 *.tar.gz
+
+# Java
+target/
+*.jar
+
+# Logs
+*.log
